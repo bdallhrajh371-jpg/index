@@ -1,0 +1,61 @@
+-- 1. إنشاء قاعدة البيانات
+CREATE DATABASE MiniCollegeDB;
+GO
+
+USE MiniCollegeDB;
+GO
+
+-- 2. جدول الأقسام (Departments)
+CREATE TABLE Departments (
+    DeptID INT PRIMARY KEY IDENTITY(1,1),
+    DeptName NVARCHAR(100) NOT NULL
+);
+
+-- 3. جدول المحاضرين (Instructors)
+CREATE TABLE Instructors (
+    InstructorID INT PRIMARY KEY IDENTITY(1,1),
+    FullName NVARCHAR(100) NOT NULL,
+    Email NVARCHAR(100),
+    DeptID INT FOREIGN KEY REFERENCES Departments(DeptID)
+);
+
+-- 4. جدول الطلاب (Students)
+CREATE TABLE Students (
+    StudentID INT PRIMARY KEY IDENTITY(1,1),
+    FullName NVARCHAR(100) NOT NULL,
+    EnrollmentDate DATE DEFAULT GETDATE(),
+    DeptID INT FOREIGN KEY REFERENCES Departments(DeptID)
+);
+
+-- 5. جدول المواد (Courses)
+CREATE TABLE Courses (
+    CourseID INT PRIMARY KEY IDENTITY(1,1),
+    CourseName NVARCHAR(100) NOT NULL,
+    Credits INT CHECK (Credits > 0),
+    InstructorID INT FOREIGN KEY REFERENCES Instructors(InstructorID)
+);
+
+-- 6. جدول التسجيل (Enrollments) - لربط الطلاب بالمواد
+CREATE TABLE Enrollments (
+    EnrollmentID INT PRIMARY KEY IDENTITY(1,1),
+    StudentID INT FOREIGN KEY REFERENCES Students(StudentID),
+    CourseID INT FOREIGN KEY REFERENCES Courses(CourseID),
+    Grade NVARCHAR(2) -- (A, B, C, etc.)
+);
+GO
+
+-- 7. إضافة بيانات تجريبية
+INSERT INTO Departments (DeptName) VALUES (N'علوم الحاسب'), (N'نظم المعلومات');
+
+INSERT INTO Instructors (FullName, Email, DeptID) 
+VALUES (N'د. سامي خالد', 'sami@college.edu', 1);
+
+INSERT INTO Students (FullName, DeptID) 
+VALUES (N'أحمد منصور', 1), (N'سارة فهد', 2);
+
+INSERT INTO Courses (CourseName, Credits, InstructorID) 
+VALUES (N'أساسيات البرمجة', 3, 1), (N'قواعد البيانات', 3, 1);
+
+INSERT INTO Enrollments (StudentID, CourseID, Grade) 
+VALUES (1, 1, 'A'), (2, 2, 'B+');
+GO
